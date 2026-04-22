@@ -1,13 +1,14 @@
 import { requireSession } from "@/lib/auth/server";
 import { db } from "@/lib/db";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import { OwnerActions } from "./owner-actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function BetPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireSession();
+  const session = await requireSession();
   const { id } = await params;
 
   const bet = await db.bet.findUnique({
@@ -16,6 +17,8 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
   });
 
   if (!bet) notFound();
+
+  const isOwner = bet.userId === session.user.id;
 
   const eventDate = bet.eventAt.toLocaleDateString("en-GB", {
     weekday: "long",
@@ -43,6 +46,11 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
           <CardHeader>
             <CardTitle className="text-2xl">{bet.description}</CardTitle>
             <CardDescription>Stakes: {bet.amount}</CardDescription>
+            {isOwner && (
+              <CardAction>
+                <OwnerActions betId={id} />
+              </CardAction>
+            )}
           </CardHeader>
           <CardContent className="flex flex-col gap-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">

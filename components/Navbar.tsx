@@ -33,12 +33,7 @@ export default function Navbar({ session }: { session: AuthSession }) {
     <nav className="bg-background shadow-md shadow-[#F7941D] py-4 border-b border-[#F7941D] dark:border-[#F7941D] fixed w-full z-10">
       <div className="container mx-auto flex justify-between items-center not-first:px-6 lg:px-8">
         <Link href={"/"} className="flex items-center">
-          <Image
-            src={"/hb-logo-transp.png"}
-            alt="HappyBet"
-            width={50}
-            height={50}
-          />
+          <Image src={"/hb-text.png"} alt="HappyBet" height={50} width={200} />
         </Link>
         <div className="flex items-center space-x-4">
           {session ? (
@@ -65,7 +60,9 @@ export default function Navbar({ session }: { session: AuthSession }) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Signed in as {session.user.name ?? session.user.email}</DropdownMenuLabel>
+                  <DropdownMenuLabel>
+                    Signed in as {session.user.name ?? session.user.email}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={handleSignOut}
