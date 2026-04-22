@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["public", "auth"]
+}
+
+// --- Neon Auth tables (auth schema — read-only, managed by Neon Auth) ---
+
+model User {
+  id            String    @id
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  name          String
+  image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
+
+  // your app relations go here, e.g.:
+  bets          Bet[]
+
+  @@schema("auth")
+  @@map("users")
+}
+
+// --- Your app tables (public schema) ---
+
+model Bet {
+  id          String      @id @default(cuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  description String
+  amount      String
+  eventAt     DateTime
+  players     BetPlayer[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@schema("public")
+}
+
+model BetPlayer {
+  id     String  @id @default(cuid())
+  betId  String
+  bet    Bet     @relation(fields: [betId], references: [id], onDelete: Cascade)
+  name   String
+  answer Boolean
+
+  @@schema("public")
+}

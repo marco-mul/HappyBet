@@ -12,5 +12,5 @@ export async function signInWithEmail(
   if (error) {
     return { error: error.message || "Failed to sign in. Try again" };
   }
-  redirect("/");
+  redirect("/dashboard");
 }
