@@ -22,7 +22,7 @@ export default async function EditBetPage({ params }: { params: Promise<{ id: st
   // First player is always the creator (by convention from create action)
   const [creatorPlayer, ...otherPlayers] = bet.players;
   const initialAnswer = creatorPlayer?.answer ? "yes" : "no";
-  const initialPlayers = otherPlayers.map((p) => p.name);
+  const initialPlayers = otherPlayers.map((p) => ({ name: p.name, userId: p.userId ?? null }));
 
   // Format for datetime-local input: "YYYY-MM-DDTHH:MM"
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -50,7 +50,7 @@ export default async function EditBetPage({ params }: { params: Promise<{ id: st
           initialAmount={bet.amount}
           initialEventAt={initialEventAt}
           initialAnswer={initialAnswer}
-          initialPlayers={initialPlayers.length > 0 ? initialPlayers : [""]}
+          initialPlayers={initialPlayers.length > 0 ? initialPlayers : [{ name: "", userId: null }]}
         />
       </Card>
     </main>

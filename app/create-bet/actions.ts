@@ -1,8 +1,21 @@
 "use server";
 
-import { requireSession } from "@/lib/auth/server";
+import { getSession, requireSession } from "@/lib/auth/server";
 import { db } from "@/lib/db";
 import { redirect } from "next/navigation";
+
+export async function searchUsers(query: string) {
+  if (!query.trim()) return [];
+  const session = await getSession();
+  return db.user.findMany({
+    where: {
+      name: { contains: query, mode: "insensitive" },
+      ...(session?.user ? { id: { not: session.user.id } } : {}),
+    },
+    select: { id: true, name: true },
+    take: 5,
+  });
+}
 
 export type CreateBetState = { error: string } | null;
 
@@ -44,11 +57,15 @@ export async function createBet(
     return { error: "Please select your answer (Yes or No)." };
   }
 
-  const otherPlayers: string[] = [];
+  const otherPlayers: { name: string; userId: string }[] = [];
   let i = 1;
   while (formData.has(`player_${i}`)) {
     const name = (formData.get(`player_${i}`) as string).trim();
-    if (name) otherPlayers.push(name);
+    const userId = (formData.get(`player_${i}_id`) as string)?.trim();
+    if (name && !userId) {
+      return { error: `Please select "${name}" from the search results.` };
+    }
+    if (name && userId) otherPlayers.push({ name, userId });
     i++;
   }
 
@@ -66,8 +83,8 @@ export async function createBet(
       eventAt: new Date(eventAt),
       players: {
         create: [
-          { name: creatorName, answer: creatorAnswer === "yes" },
-          ...otherPlayers.map((name) => ({ name, answer: false })),
+          { name: creatorName, answer: creatorAnswer === "yes", userId: session.user.id },
+          ...otherPlayers.map(({ name, userId }) => ({ name, answer: false, userId })),
         ],
       },
     },

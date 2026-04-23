@@ -1,0 +1,2 @@
+ALTER TABLE "BetPlayer" ADD COLUMN "userId" TEXT;
+ALTER TABLE "BetPlayer" ADD CONSTRAINT "BetPlayer_userId_fkey" FOREIGN KEY ("userId") REFERENCES "auth"."users"("id") ON DELETE SET NULL ON UPDATE CASCADE;

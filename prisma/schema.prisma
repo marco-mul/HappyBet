@@ -19,13 +19,13 @@ model User {
   id            String    @id
   email         String    @unique
   emailVerified Boolean   @default(false)
-  name          String
+  name          String  @unique
   image         String?
   createdAt     DateTime
   updatedAt     DateTime
 
-  // your app relations go here, e.g.:
   bets          Bet[]
+  betPlayers    BetPlayer[]
 
   @@schema("auth")
   @@map("users")
@@ -40,6 +40,7 @@ model Bet {
   description String
   amount      String
   eventAt     DateTime
+  outcome     Boolean?
   players     BetPlayer[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
@@ -51,6 +52,8 @@ model BetPlayer {
   id     String  @id @default(cuid())
   betId  String
   bet    Bet     @relation(fields: [betId], references: [id], onDelete: Cascade)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
   name   String
   answer Boolean
 

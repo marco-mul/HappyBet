@@ -5,7 +5,9 @@ export default auth.middleware({
 });
 export const config = {
   matcher: [
-    // Protected routes requiring authentication
-    '/account/:path*',
+    {
+      source: '/(dashboard|bets|create-bet)(.*)',
+      missing: [{ type: 'header', key: 'next-action' }],
+    },
   ],
 };

@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
+import { getSession } from "@/lib/auth/server";
 
-export default function Home() {
+export default async function Home() {
+  const session = await getSession();
+
   return (
     <div className="flex flex-col gap-2 min-h-screen items-center pt-30">
       <div>
@@ -24,18 +27,20 @@ export default function Home() {
       </p>
       <h2 className="mb-4 text-2xl font-semibold">Start betting with your friends today!</h2>{" "}
       <div className="flex item-center gap-2">
-        <Link
-          href="/auth/sign-up"
-          className="inline-flex text-lg text-indigo-400 hover:underline"
-        >
-          <Button>Sign-up</Button>
-        </Link>
-        <Link
-          href="/auth/sign-in"
-          className="inline-flex text-lg text-indigo-400 hover:underline"
-        >
-          <Button>Sign-in</Button>
-        </Link>
+        {session ? (
+          <Link href="/create-bet">
+            <Button size="lg">Start Betting Now</Button>
+          </Link>
+        ) : (
+          <>
+            <Link href="/auth/sign-up">
+              <Button>Sign-up</Button>
+            </Link>
+            <Link href="/auth/sign-in">
+              <Button>Sign-in</Button>
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

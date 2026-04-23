@@ -33,9 +33,9 @@ export default function Navbar({ session }: { session: AuthSession }) {
     <nav className="bg-background shadow-md shadow-[#F7941D] py-4 border-b border-[#F7941D] dark:border-[#F7941D] fixed w-full z-10">
       <div className="container mx-auto flex justify-between items-center not-first:px-6 lg:px-8">
         <Link href={"/"} className="flex items-center">
-          <Image src={"/hb-text.png"} alt="HappyBet" height={50} width={200} />
+          <Image src={"/hb-text.png"} alt="HappyBet" height={36} width={144} />
         </Link>
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-4 pl-8">
           {session ? (
             <>
               <Link
@@ -49,7 +49,7 @@ export default function Navbar({ session }: { session: AuthSession }) {
                 className="text-foreground hover:text-gray-500 dark:hover:text-gray-400"
               >
                 <Button variant="outline" className="hover:cursor-pointer">
-                  New Bet
+                  <span className="hidden sm:inline">New Bet</span>
                   <Plus className="h-4 w-4" />
                 </Button>
               </Link>

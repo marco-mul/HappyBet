@@ -40,11 +40,15 @@ export async function updateBet(
     return { error: "Please select your answer (Yes or No)." };
   }
 
-  const otherPlayers: string[] = [];
+  const otherPlayers: { name: string; userId: string }[] = [];
   let i = 1;
   while (formData.has(`player_${i}`)) {
     const name = (formData.get(`player_${i}`) as string).trim();
-    if (name) otherPlayers.push(name);
+    const userId = (formData.get(`player_${i}_id`) as string)?.trim();
+    if (name && !userId) {
+      return { error: `Please select "${name}" from the search results.` };
+    }
+    if (name && userId) otherPlayers.push({ name, userId });
     i++;
   }
 
@@ -63,12 +67,53 @@ export async function updateBet(
       eventAt: new Date(eventAt),
       players: {
         create: [
-          { name: creatorName, answer: creatorAnswer === "yes" },
-          ...otherPlayers.map((name) => ({ name, answer: false })),
+          { name: creatorName, answer: creatorAnswer === "yes", userId: session.user.id },
+          ...otherPlayers.map(({ name, userId }) => ({ name, answer: false, userId })),
         ],
       },
     },
   });
 
+  redirect(`/bets/${betId}`);
+}
+
+export type OutcomeState = { error: string } | null;
+
+export async function setOutcome(
+  betId: string,
+  _prevState: OutcomeState,
+  formData: FormData
+): Promise<OutcomeState> {
+  await requireOwner(betId);
+  const outcome = formData.get("outcome");
+  if (outcome !== "yes" && outcome !== "no") {
+    return { error: "Invalid outcome." };
+  }
+  await db.bet.update({
+    where: { id: betId },
+    data: { outcome: outcome === "yes" },
+  });
+  redirect(`/bets/${betId}`);
+}
+
+export type VoteState = { error: string } | null;
+
+export async function voteOnBet(
+  betId: string,
+  _prevState: VoteState,
+  formData: FormData
+): Promise<VoteState> {
+  const session = await requireSession();
+  const answer = formData.get("answer");
+  if (answer !== "yes" && answer !== "no") {
+    return { error: "Invalid answer." };
+  }
+  const updated = await db.betPlayer.updateMany({
+    where: { betId, userId: session.user.id },
+    data: { answer: answer === "yes" },
+  });
+  if (updated.count === 0) {
+    return { error: "You are not a player in this bet." };
+  }
   redirect(`/bets/${betId}`);
 }

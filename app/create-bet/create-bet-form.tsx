@@ -2,14 +2,12 @@
 
 import { useActionState, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusCircle, X } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { createBet, type CreateBetState } from "./actions";
+import { PlayerSearchInput, type PlayerData } from "@/components/player-search-input";
 
 const MAX_PLAYERS = 10;
 
@@ -18,7 +16,7 @@ export function CreateBetForm() {
     createBet,
     null
   );
-  const [playerCount, setPlayerCount] = useState(1);
+  const [players, setPlayers] = useState<PlayerData[]>([{ name: "", userId: null }]);
   const [answer, setAnswer] = useState<"yes" | "no" | null>(null);
 
   return (
@@ -83,36 +81,29 @@ export function CreateBetForm() {
             {/* Bottom: players full width */}
             <div className="font-bold">Who are you playing with?</div>
             <div className="grid grid-cols-2 gap-x-8 gap-y-6">
-              {Array.from({ length: playerCount }, (_, i) => (
-                <div key={i} className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor={`player_${i + 1}`}>Player {i + 1}</Label>
-                    {i > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setPlayerCount((c) => c - 1)}
-                        className="text-muted-foreground hover:text-destructive"
-                        aria-label={`Remove player ${i + 1}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  <Input
-                    id={`player_${i + 1}`}
-                    name={`player_${i + 1}`}
-                    placeholder="e.g. John"
-                    required
-                  />
-                </div>
+              {players.map((player, i) => (
+                <PlayerSearchInput
+                  key={i}
+                  index={i}
+                  player={player}
+                  onChange={(p) =>
+                    setPlayers((prev) => prev.map((pl, idx) => (idx === i ? p : pl)))
+                  }
+                  onRemove={() =>
+                    setPlayers((prev) => prev.filter((_, idx) => idx !== i))
+                  }
+                  showRemove={i > 0}
+                />
               ))}
-              {playerCount < MAX_PLAYERS && (
+              {players.length < MAX_PLAYERS && (
                 <div className="flex items-end">
                   <Button
                     type="button"
                     variant="ghost"
                     className="w-fit gap-2 text-muted-foreground"
-                    onClick={() => setPlayerCount((c) => c + 1)}
+                    onClick={() =>
+                      setPlayers((prev) => [...prev, { name: "", userId: null }])
+                    }
                   >
                     <PlusCircle className="h-4 w-4" />
                     Add player
