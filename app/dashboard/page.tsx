@@ -17,6 +17,12 @@ export default async function DashboardPage() {
   const session = await requireSession();
 
   const bets = await db.bet.findMany({
+    where: {
+      OR: [
+        { userId: session.user.id },
+        { players: { some: { userId: session.user.id } } },
+      ],
+    },
     include: { user: true, players: true },
     orderBy: { eventAt: "asc" },
   });
@@ -25,13 +31,8 @@ export default async function DashboardPage() {
   const upcoming = bets.filter((b) => b.eventAt >= now);
   const past = bets.filter((b) => b.eventAt < now);
 
-  const myBets = bets.filter(
-    (b) =>
-      b.userId === session.user.id ||
-      b.players.some((p) => p.userId === session.user.id)
-  );
-  const finished = myBets.filter((b) => b.outcome !== null);
-  const ongoing = myBets.filter((b) => b.outcome === null);
+  const finished = bets.filter((b) => b.outcome !== null);
+  const ongoing = bets.filter((b) => b.outcome === null);
   const won = finished.filter((b) => {
     const myPlayer = b.players.find((p) => p.userId === session.user.id);
     return myPlayer !== undefined && myPlayer.answer === b.outcome;
