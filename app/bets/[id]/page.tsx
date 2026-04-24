@@ -6,6 +6,7 @@ import Image from "next/image";
 import { OwnerActions } from "./owner-actions";
 import { VoteButtons } from "./vote-buttons";
 import { OutcomeButtons } from "./outcome-buttons";
+import { LocalDate } from "@/components/local-date";
 
 export const dynamic = "force-dynamic";
 
@@ -24,14 +25,6 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
   const currentPlayer = bet.players.find((p) => p.userId === session.user.id);
   const isOver = bet.eventAt < new Date();
 
-  const eventDate = bet.eventAt.toLocaleDateString("en-GB", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
   const yesPlayers = bet.players.filter((p) => p.answer);
   const noPlayers = bet.players.filter((p) => !p.answer);
@@ -62,7 +55,10 @@ export default async function BetPage({ params }: { params: Promise<{ id: string
           <CardContent className="flex flex-col gap-6">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="font-medium text-foreground">Event date:</span>
-              {eventDate}
+              <LocalDate
+                isoString={bet.eventAt.toISOString()}
+                options={{ weekday: "long", year: "numeric", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" }}
+              />
             </div>
 
             <div className="flex flex-col gap-1">

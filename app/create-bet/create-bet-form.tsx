@@ -18,12 +18,16 @@ export function CreateBetForm() {
   );
   const [players, setPlayers] = useState<PlayerData[]>([{ name: "", userId: null }]);
   const [answer, setAnswer] = useState<"yes" | "no" | null>(null);
+  const [tzOffset] = useState(() =>
+    typeof window === "undefined" ? 0 : new Date().getTimezoneOffset()
+  );
 
   return (
     <>
       <CardContent>
         <form id="create-bet-form" action={formAction}>
           <input type="hidden" name="answer" value={answer ?? ""} />
+          <input type="hidden" name="tzOffset" value={tzOffset} suppressHydrationWarning />
           <div className="flex flex-col gap-6">
             {/* Top: two columns */}
             <div className="grid grid-cols-2 gap-x-8 gap-y-6">

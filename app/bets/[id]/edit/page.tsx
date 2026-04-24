@@ -24,10 +24,7 @@ export default async function EditBetPage({ params }: { params: Promise<{ id: st
   const initialAnswer = creatorPlayer?.answer ? "yes" : "no";
   const initialPlayers = otherPlayers.map((p) => ({ name: p.name, userId: p.userId ?? null }));
 
-  // Format for datetime-local input: "YYYY-MM-DDTHH:MM"
-  const pad = (n: number) => String(n).padStart(2, "0");
-  const d = bet.eventAt;
-  const initialEventAt = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  const initialEventAt = bet.eventAt.toISOString();
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center gap-4 px-6 pt-28 pb-12">

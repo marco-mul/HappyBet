@@ -30,6 +30,7 @@ export async function updateBet(
   const description = (formData.get("bet") as string)?.trim();
   const amount = (formData.get("amount") as string)?.trim();
   const eventAt = formData.get("eventAt") as string;
+  const tzOffset = parseInt(formData.get("tzOffset") as string) || 0;
 
   if (!description || !amount || !eventAt) {
     return { error: "Please fill in all required fields." };
@@ -64,7 +65,7 @@ export async function updateBet(
     data: {
       description,
       amount,
-      eventAt: new Date(eventAt),
+      eventAt: new Date(new Date(eventAt).getTime() + tzOffset * 60 * 1000),
       players: {
         create: [
           { name: creatorName, answer: creatorAnswer === "yes", userId: session.user.id },

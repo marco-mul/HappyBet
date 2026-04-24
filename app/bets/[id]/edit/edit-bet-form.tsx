@@ -36,12 +36,22 @@ export function EditBetForm({
   );
   const [answer, setAnswer] = useState<"yes" | "no">(initialAnswer);
   const [players, setPlayers] = useState<PlayerData[]>(initialPlayers);
+  const [tzOffset] = useState(() =>
+    typeof window === "undefined" ? 0 : new Date().getTimezoneOffset()
+  );
+  const [eventAtValue] = useState(() => {
+    if (typeof window === "undefined") return "";
+    const d = new Date(initialEventAt);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  });
 
   return (
     <>
       <CardContent>
         <form id="edit-bet-form" action={formAction}>
           <input type="hidden" name="answer" value={answer} />
+          <input type="hidden" name="tzOffset" value={tzOffset} suppressHydrationWarning />
           <div className="flex flex-col gap-6">
             <div className="grid grid-cols-2 gap-x-8 gap-y-6">
               <div className="flex flex-col gap-6">
@@ -92,8 +102,9 @@ export function EditBetForm({
                     id="eventAt"
                     name="eventAt"
                     type="datetime-local"
-                    defaultValue={initialEventAt}
+                    defaultValue={eventAtValue}
                     required
+                    suppressHydrationWarning
                   />
                 </div>
               </div>

@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { LocalDate } from "@/components/local-date";
 
 export const dynamic = "force-dynamic";
 
@@ -134,13 +135,6 @@ function BetCard({ bet, currentUserId }: { bet: Bet; currentUserId: string }) {
     ? "You"
     : bet.user.name ?? bet.user.email;
 
-  const eventDate = bet.eventAt.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
   const yesCount = bet.players.filter((p) => p.answer).length;
   const noCount = bet.players.filter((p) => !p.answer).length;
@@ -159,7 +153,10 @@ function BetCard({ bet, currentUserId }: { bet: Bet; currentUserId: string }) {
           </CardAction>
         </CardHeader>
         <CardContent className="text-xs text-muted-foreground">
-          {eventDate}
+          <LocalDate
+            isoString={bet.eventAt.toISOString()}
+            options={{ day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }}
+          />
         </CardContent>
         <CardFooter className="flex-col gap-1.5">
           <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
